@@ -1,11 +1,12 @@
 """
 Simple graph implementation
 """
-from util import Stack, Queue  # These may come in handy
+from util import Queue, Stack
 
 class Graph:
 
     """Represent a graph as a dictionary of vertices mapping labels to edges."""
+
     def __init__(self):
         self.vertices = {}
 
@@ -13,42 +14,78 @@ class Graph:
         """
         Add a vertex to the graph.
         """
-        pass  # TODO
+        self.vertices[vertex_id] = set()  # TODO
 
     def add_edge(self, v1, v2):
         """
         Add a directed edge to the graph.
         """
-        pass  # TODO
+        self.vertices[v1].add(v2)  # TODO
 
     def get_neighbors(self, vertex_id):
         """
         Get all neighbors (edges) of a vertex.
         """
-        pass  # TODO
+        return self.vertices[vertex_id]  # TODO
 
     def bft(self, starting_vertex):
         """
         Print each vertex in breadth-first order
         beginning from starting_vertex.
         """
-        pass  # TODO
+        visited = set()  # TODO
+        queue = Queue()
+        queue.enqueue(starting_vertex)
+
+        while queue.size() > 0:
+            vertex = queue.dequeue()
+            if vertex not in visited:
+                print(vertex)
+                visited.add(vertex)
+
+            for edge in self.vertices[vertex]:
+                if edge not in visited:
+                    queue.enqueue(edge)
+
+        return visited
 
     def dft(self, starting_vertex):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
         """
-        pass  # TODO
+        visited = set()  # TODO
+        stack = Stack()
+        stack.push(starting_vertex)
 
-    def dft_recursive(self, starting_vertex):
+        while stack.size() > 0:
+            vertex = stack.pop()
+            if vertex not in visited:
+                print(vertex)
+                visited.add(vertex)
+
+            for edge in self.vertices[vertex]:
+                if edge not in visited:
+                    stack.push(edge)
+
+        return visited
+
+    def dft_recursive(self, starting_vertex, cache=None):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
-
         This should be done using recursion.
         """
-        pass  # TODO
+        print(starting_vertex)  # TODO
+
+        if cache is None:
+            cache = set()
+
+        cache.add(starting_vertex)
+
+        for i in self.get_neighbors(starting_vertex):
+            if i not in cache:
+                self.dft_recursive(starting_vertex=i, cache=cache)
 
     def bfs(self, starting_vertex, destination_vertex):
         """
@@ -56,7 +93,24 @@ class Graph:
         starting_vertex to destination_vertex in
         breath-first order.
         """
-        pass  # TODO
+        visited = {}  # TODO
+        queue = Queue()
+        queue.enqueue([starting_vertex, None])
+        while queue.size() > 0:
+            (vertex, prev) = queue.dequeue()
+            if vertex not in visited:
+                visited[vertex] = prev
+                if vertex == destination_vertex:
+                    step = vertex
+                    path = []
+                    while step is not None:
+                        path.append(step)
+                        step = visited[step]
+                    return path[::-1]
+
+            for edge in self.vertices[vertex]:
+                if edge not in visited:
+                    queue.enqueue((edge, vertex))
 
     def dfs(self, starting_vertex, destination_vertex):
         """
@@ -64,17 +118,63 @@ class Graph:
         starting_vertex to destination_vertex in
         depth-first order.
         """
-        pass  # TODO
 
-    def dfs_recursive(self, starting_vertex, destination_vertex):
+        visited = {}  # TODO
+        stack = Stack()
+        stack.push([starting_vertex, None])
+        while stack.size() > 0:
+            (vertex, prev) = stack.pop()
+            if vertex not in visited:
+                visited[vertex] = prev
+                if vertex == destination_vertex:
+                    step = vertex
+                    path = []
+                    while step is not None:
+                        path.append(step)
+                        step = visited[step]
+
+                    return path[::-1]
+
+            for edge in self.vertices[vertex]:
+                if edge not in visited:
+                    stack.push((edge, vertex))
+
+    def dfs_recursive(
+        self, starting_vertex, destination_vertex, path=None, visited=None
+    ):
+
         """
         Return a list containing a path from
         starting_vertex to destination_vertex in
         depth-first order.
-
         This should be done using recursion.
         """
-        pass  # TODO
+        if visited is None:  # TODO
+            visited = set()
+
+        if path is None:
+            path = []
+
+        visited.add(starting_vertex)
+
+        path = path + [starting_vertex]
+
+        if starting_vertex == destination_vertex:
+            return path
+
+        for i in self.get_neighbors(starting_vertex):
+            if i not in visited:
+                new_path = self.dfs_recursive(
+                    starting_vertex=i,
+                    destination_vertex=destination_vertex,
+                    path=path,
+                    visited=visited,
+                )
+
+                if new_path:
+                    return new_path
+
+        return None
 
 if __name__ == '__main__':
     graph = Graph()  # Instantiate your graph
@@ -143,3 +243,52 @@ if __name__ == '__main__':
     '''
     print(graph.dfs(1, 6))
     print(graph.dfs_recursive(1, 6))
+
+    def find_words(starting_word, ending_word):
+        visited = set()
+        pending = Queue()
+
+        pending.enqueue([starting_word])
+
+        while len(pending) > 0:
+            path = pending.dequeue()
+            vert = path[-1]
+
+            if vert == ending_word:
+                return path
+            
+            if vert not in visited:
+                visited.add(vert)
+                for neighbor in get_neighbors(vert):
+                    new_path = list(path)
+                    new_path.append(neighbor)
+                    pending.enqueue(new_path)
+
+
+    import string
+    letters = list(string.ascii_lowercase)
+    word_set = set(['hit', 'hot', 'hog', 'cog', 'cot'])
+
+    def get_neighbors(word):
+        neighbors = []
+        # g = Graph()
+
+        # starting_word = list(word)
+
+        for i, _ in enumerate(word):
+            for letter in letters:
+                new_word = list(word)
+                new_word[i] = letter
+                w = "".join(new_word)
+
+                if w == word:
+                    continue
+
+                if w in word_set:
+                    neighbors.append(w)
+
+        return neighbors
+
+
+
+    print(find_words("hit", "cog"))
