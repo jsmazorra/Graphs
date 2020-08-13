@@ -1,3 +1,6 @@
+import random
+from util import Queue
+
 class User:
     def __init__(self, name):
         self.name = name
@@ -32,18 +35,31 @@ class SocialGraph:
         """
         Takes a number of users and an average number of friendships
         as arguments
-
+​
         Creates that number of users and a randomly distributed friendships
         between those users.
-
+​
         The number of users must be greater than the average number of friendships.
         """
         # Reset graph
         self.last_id = 0
         self.users = {}
         self.friendships = {}
-        # !!!! IMPLEMENT ME
+        # Add users
+        for i in range(num_users):
+            self.add_user(f"User {i}")
+        # Create friendships
+        possible_friendships = []
+        
+        for user_id in self.users:
+            for friend_id in range(user_id + 1, self.last_id + 1):
+                possible_friendships.append((user_id, friend_id))
 
+        random.shuffle(possible_friendships)
+
+        for i in range(num_users * avg_friendships // 2):
+            friendships = possible_friendships[i]
+            self.add_friendship(friendships[0], friendships[1])
         # Add users
 
         # Create friendships
@@ -59,12 +75,22 @@ class SocialGraph:
         """
         visited = {}  # Note that this is a dictionary, not a set
         # !!!! IMPLEMENT ME
+        queue = [user_id]
+        visited[user_id] = [user_id]
+        while len(queue) > 0:
+            node = queue.pop()
+            friends_node = self.friendships[node]
+            for fr in friends_node:
+                if fr not in visited:
+                    visited[fr] = visited[node] + [fr]
+                    queue.append(fr)
+
         return visited
 
 
 if __name__ == '__main__':
     sg = SocialGraph()
-    sg.populate_graph(10, 2)
+    sg.populate_graph(5000, 2)
     print(sg.friendships)
     connections = sg.get_all_social_paths(1)
     print(connections)
