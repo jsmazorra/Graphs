@@ -1,7 +1,6 @@
 from room import Room
 from player import Player
 from world import World
-
 import random
 from ast import literal_eval
 
@@ -26,9 +25,33 @@ world.print_rooms()
 player = Player(world.starting_room)
 
 # Fill this out with directions to walk
-# traversal_path = ['n', 'n']
+# traversal_path = ['n', 's']
 traversal_path = []
+visited = {}
+# reversed_traversal = ['e', 'w']
+reversed_traversal = []
+directions = {"s": "n", "w": "e", "e": "w", "n": "s"}
 
+visited[player.current_room.id] = player.current_room.get_exits()
+
+while len(visited) < len(room_graph):
+    if player.current_room.id not in visited:
+        visited[player.current_room.id] = player.current_room.get_exits()
+        previous_room = reversed_traversal[-1]
+        visited[player.current_room.id].remove(previous_room)
+        
+    elif len(visited[player.current_room.id]) == 0:
+        previous_room = reversed_traversal[-1]
+        reversed_traversal.pop()
+        traversal_path.append(previous_room)
+        player.travel(previous_room)
+    
+    else:
+        v = visited[player.current_room.id][-1]
+        visited[player.current_room.id].pop()
+        traversal_path.append(v)
+        reversed_traversal.append(directions[v])
+        player.travel(v)
 
 
 # TRAVERSAL TEST
