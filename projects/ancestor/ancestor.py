@@ -34,5 +34,5 @@ def earliest_ancestor(ancestors, starting_node):
                 # stack.push(current + [i])
     
     # For testing purposes.
-    print("OUTPUT:", length[1]) 
+    print("OUTPUT:", length[1])    
     return length[1]
